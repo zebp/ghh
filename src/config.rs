@@ -4,6 +4,15 @@ use serde::Deserialize;
 
 pub type Config = Vec<RepositoryConfig>;
 
+pub async fn read_config() -> anyhow::Result<Config> {
+    let config_path = std::env::var("CONFIG_PATH")
+        .ok()
+        .map(PathBuf::from)
+        .unwrap_or_else(|| PathBuf::from("config.yml"));
+    let contents = tokio::fs::read_to_string(config_path).await?;
+    serde_yaml::from_str(&contents).map_err(Into::into)
+}
+
 #[derive(Debug, Clone, Deserialize)]
 pub struct RepositoryConfig {
     /// The user or organization that owns the repo on github.
@@ -16,6 +25,7 @@ pub struct RepositoryConfig {
 
 /// The events the user would like to monitor for.
 #[derive(Debug, Clone, Deserialize)]
+#[serde(tag = "type", rename_all = "lowercase")]
 pub enum Interest {
     Commit(CommitInterest),
     Release(ReleaseInterest),

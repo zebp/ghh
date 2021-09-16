@@ -1,0 +1,17 @@
+# An empty example config.
+- owner: denoland
+  name: deno_std
+  interests:
+    - type: commit
+      branch: main
+      containers:
+        - image: doc_collector:0.1.0
+          event_path: /event.json
+          env:
+            DOC_TYPE: git
+    - type: release
+      containers:
+        - image: doc_collector:0.1.0
+          event_path: /event.json
+          env:
+            DOC_TYPE: normal
